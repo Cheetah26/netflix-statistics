@@ -5,20 +5,24 @@ body {
   width           : 100%;
   height          : 100%;
   padding         : 0;
-  margin          : 0;
+  margin          : auto;
   background-color: #141414;
   color           : #fff;
   font-family     : 'Helvetica Neue', Helvetica, Arial, sans-serif
 }
 
 body {
-  display: flex;
+  display: grid;
+  grid-template-columns: [start] 25% [middle] 75% [end];
+  grid-template-rows: [start] auto [middle] auto [end];
+  max-width: 2560px;
 }
 
 #shows_list {
+  grid-column: start / middle;
+  grid-row: start / end;
   display         : flex;
   flex-direction  : column;
-  min-width       : 20%;
   overflow-y      : scroll;
   overflow-x      : hidden;
   background-color: #000;
@@ -40,10 +44,14 @@ body {
   color          : inherit;
 }
 
-#right_box {
-  width  : 80%;
-  max-height: 100%;
-  padding: 10px;
+#graph_container {
+  grid-column: middle / end;
+  grid-row: start / middle;
+}
+
+#usage {
+  grid-column: middle / end;
+  grid-row: middle / end
 }
 
 #usage * {

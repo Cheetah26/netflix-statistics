@@ -2,7 +2,7 @@ var lastTarget = null;
 
 var shows = {};
 
-var myChart = null;
+var graph = null;
 var currentYear = null;
 var currentShow = null;
 
@@ -21,6 +21,7 @@ const csvStringToArray = (strData) => {
 }
 
 function processData(data) {
+    shows = {};
     for (var i = data.length - 1; i > 1; i--) {
         if (data[i].length == 2) {
             var name = data[i][0].split(": ")[0];
@@ -50,6 +51,7 @@ function processData(data) {
 
     // Create list of shows on left
     var showsList = document.getElementById('shows_list');
+    showsList.innerHTML = "";
     // Year headers
     Array.from(Object.keys(shows)).forEach(year => {
         showsList.innerHTML += '<div id=\'' + year + '_area\'><a href="javascript:graphYear(' + year + ')"><h2>20' + year + '</h2></a></div>';
@@ -100,10 +102,10 @@ function graphYear(year) {
         }
     }
 
-    myChart.data.labels = MONTH_LABELS;
-    myChart.data.datasets[0].data = graphData;
-    myChart.data.datasets[0].label = 'Watches per month in 20' + year;
-    myChart.update();
+    graph.data.labels = MONTH_LABELS;
+    graph.data.datasets[0].data = graphData;
+    graph.data.datasets[0].label = 'Watches per month in 20' + year;
+    graph.update();
 
     setTotalViews(graphData);
 }
@@ -123,10 +125,10 @@ function graphMonth(year, month, monthName) {
         labels.push(day + 1);
     }
 
-    myChart.data.labels = labels;
-    myChart.data.datasets[0].data = graphData;
-    myChart.data.datasets[0].label = 'Watches in ' + monthName + ' 20' + year;
-    myChart.update();
+    graph.data.labels = labels;
+    graph.data.datasets[0].data = graphData;
+    graph.data.datasets[0].label = 'Watches in ' + monthName + ' 20' + year;
+    graph.update();
 
     setTotalViews(graphData);
 }
@@ -146,10 +148,10 @@ function graphShowYear(year, show) {
         }
     }
 
-    myChart.data.labels = MONTH_LABELS;
-    myChart.data.datasets[0].data = graphData;
-    myChart.data.datasets[0].label = show + ' in 20' + year;
-    myChart.update();
+    graph.data.labels = MONTH_LABELS;
+    graph.data.datasets[0].data = graphData;
+    graph.data.datasets[0].label = show + ' in 20' + year;
+    graph.update();
 
     setTotalViews(graphData);
 }
@@ -165,10 +167,10 @@ function graphShowMonth(year, month, monthName, show) {
         labels.push(day + 1);
     }
 
-    myChart.data.labels = labels;
-    myChart.data.datasets[0].data = graphData;
-    myChart.data.datasets[0].label = show + ' in ' + monthName + ' 20' + year;
-    myChart.update();
+    graph.data.labels = labels;
+    graph.data.datasets[0].data = graphData;
+    graph.data.datasets[0].label = show + ' in ' + monthName + ' 20' + year;
+    graph.update();
 
     setTotalViews(graphData);
 }
@@ -210,9 +212,9 @@ window.addEventListener("dragleave", function (e) {
 
 // graph click handler
 function handleClick(evt) {
-    const points = myChart.getElementsAtEventForMode(evt, 'nearest', { intersect: true }, true);
+    const points = graph.getElementsAtEventForMode(evt, 'nearest', { intersect: true }, true);
     var monthNum = points[0].index + 1;
-    var month = myChart.data.labels[points[0].index];
+    var month = graph.data.labels[points[0].index];
     if (currentShow)
         graphShowMonth(currentYear, monthNum, month, currentShow)
     else
@@ -229,7 +231,9 @@ document.addEventListener("DOMContentLoaded", function () {
     Chart.defaults.color = '#fff';
     Chart.defaults.font.size = 16;
 
-    myChart = new Chart(document.getElementById('myChart'), {
+    graph = new Chart(document.getElementById('graph_canvas'), {
+        responsive: true,
+        maintainAspectRatio: false,
         type: 'bar',
         data: {
             labels: MONTH_LABELS,
@@ -241,10 +245,17 @@ document.addEventListener("DOMContentLoaded", function () {
             }]
         },
         options: {
-            responsive: true,
             onClick: (e) => {
                 handleClick(e);
             }
         },
     });
 });
+
+window.addEventListener('beforeprint', () => {
+    myChart.resize(600, 600);
+  });
+
+window.addEventListener('afterprint', () => {
+    graph.resize();
+  });
